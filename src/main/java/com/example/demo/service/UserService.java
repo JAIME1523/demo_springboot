@@ -12,13 +12,10 @@ public class UserService {
     public UserService() {
         userList = new ArrayList<>();
 
-        User user1 = new User(1, "Ida", 32, "ida@mail.com");
-        User user2 = new User(2, "Hans", 26, "hans@mail.com");
-        User user3 = new User(3, "Lars", 45, "lars@mail.com");
-        User user4 = new User(4, "Ben", 32, "ben@mail.com");
-        User user5 = new User(5, "Eva", 59, "eva@mail.com");
+        User user1 = new User(1, "Test", 32, "test@mail.com");
 
-        userList.addAll(Arrays.asList(user1, user2, user3, user4, user5));
+
+        userList.add(user1);
     }
 
     public User getUser(Integer id) {
