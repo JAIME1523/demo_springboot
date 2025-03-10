@@ -1,90 +1,74 @@
 package com.example.demo.service;
 
+import com.example.demo.DB.DbMaria;
 import com.example.demo.api.model.User;
+import com.example.demo.common.Errors.ExceptionClass;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class UserService {
-    private final List<User> userList;
+
+
+    @Autowired
+    private DbMaria dbMaria;
+
 
     public UserService() {
-        userList = new ArrayList<>();
 
-        User user1 = new User(1, "Ida", 32, "ida@mail.com");
-        User user2 = new User(2, "Hans", 26, "hans@mail.com");
-        User user3 = new User(3, "Lars", 45, "lars@mail.com");
-        User user4 = new User(4, "Ben", 32, "ben@mail.com");
-        User user5 = new User(5, "Eva", 59, "eva@mail.com");
-
-        userList.addAll(Arrays.asList(user1, user2, user3, user4, user5));
     }
 
-    public User getUser(Integer id) {
-        User userget = null;
-        for (User user : userList) {
-            if (user.getId() == id) {
-                userget = user;
-                return userget;
-            }
-        }
-        ;
-        return userget;
+
+    public Optional<User> getUser(Integer id) {
+        return dbMaria.findById(id);
     }
 
 
     public List<User> getUsers() {
-        return userList;
+        List<User> data;
+        data = dbMaria.findAll();
+
+        return data;
     }
 
     public User createUser(String name, String email, int age) {
-        int index = userList.size() - 1;
-        int last = index > 0 ? userList.get(userList.size() - 1).getId() + 1 : 1;
-        User user = new User(last, name, age, email);
-        userList.add(user);
-        return user;
+       return dbMaria.save(new User(name, age, email));
     }
 
-    public boolean deleteUser(Integer id) {
-        System.out.println("El último elemento es: " + id);
-        User user = getUser(id);
-
-        if (user == null) {
-            throw new NoSuchElementException("User not found");
-        } else {
-            userList.remove(user);
-
-            return true;
+    public boolean deleteUser(Integer id) throws Exception {
+        var isExist =  dbMaria.findById(id);
+        if(isExist.isEmpty()) {
+            throw new ExceptionClass("No se encontro", HttpStatus.NOT_FOUND);
         }
-
+        try {
+            dbMaria.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            throw new ExceptionClass("REVISAR LOGS", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     ;
 
 
-    public User updateUser(int id, String name, String email, int age) {
-
-        try {
-            User userSelect = (User) userList.stream()
-                    .filter(u -> u.getId() == id).findFirst()
-                    .orElse(null);;
-                    if(userSelect == null) return  null;
-           if( name != null) {
-               userSelect.setName(name);
+    public  Optional<User> updateUser(int id, String name, String email, Integer age) {
+        Optional<User> isExist =  dbMaria.findById(id);
+        if(isExist.isEmpty()) return Optional.empty();
+     User  userSelect  = isExist.get();
+        if( name != null) {
+            userSelect.setName(name);
            }
-            if(age != 0) {
+            if(age != null) {
                 userSelect.setAge(age);
             }
             if( email != null) {
                 userSelect.setEmail(email);
             }
 
-            return userSelect;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
+        return Optional.of(dbMaria.save(userSelect));
 
     }
 }

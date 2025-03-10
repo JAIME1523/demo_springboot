@@ -1,26 +1,36 @@
 package com.example.demo.api.model;
 
-public class User {
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(name = "name")
     private String name;
+    @Column(name = "age")
     private int age;
+    @Column(name = "email")
     private String email;
 
-    public User(int id, String name, int age, String email) {
-        this.id = id;
+    public User( String name, int age, String email) {
         this.name = name;
         this.age = age;
         this.email = email;
     }
 
+    public User() {
+
+    }
+
+
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+
 
     public String getName() {
         return name;
